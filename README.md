@@ -1,4 +1,4 @@
-# DSH Browser Control 一键安装器
+# DSH Chrome 控制（控制你的 Google Chrome）一键安装器
 
 让 **DeepSeek Harness（DSH）** 直接操控你日常使用的 **真实 Chrome**（保留登录态、Cookie、扩展），不用重新登录，也不用无头浏览器。
 
