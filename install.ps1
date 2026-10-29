@@ -65,3 +65,17 @@ Write-Host "加载后：工具栏出现鲸鱼图标、绿点呼吸 = 已连接�
 Write-Host "然后重启一次 DSH，让 browser_* 工具注册。"
 Write-Host ""
 Write-Host "验证桥状态: http://127.0.0.1:9777/api/status （extensionConnected 应为 true）"
+
+# 自动打开扩展页并把扩展路径放进剪贴板，少点几下
+Set-Clipboard -Value $extDir
+$chrome = @(
+  "C:\Program Files\Google\Chrome\Application\chrome.exe",
+  "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
+  "$env:LOCALAPPDATA\Google\Chrome\Application\chrome.exe"
+) | Where-Object { Test-Path $_ } | Select-Object -First 1
+if ($chrome) {
+  Start-Process $chrome -ArgumentList "chrome://extensions"
+  Write-Host "已打开 chrome://extensions，扩展路径已复制到剪贴板（直接 Ctrl+V）。" -ForegroundColor Cyan
+} else {
+  Write-Host "未找到 Chrome，请手动打开 chrome://extensions。" -ForegroundColor Yellow
+}
