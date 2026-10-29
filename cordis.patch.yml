@@ -1,0 +1,9 @@
+# dsh-chrome-control-zh：把真实 Chrome 控制能力挂进 DSH
+# 本包是一个 bundle 包装：依赖并加载 @caob23/dsh-browser-control。
+- insert:
+    - id: browser-bridge
+      name: '@caob23/dsh-browser-control'
+      config:
+        enabled: true
+        port: 9777
+        token: dsh-local
