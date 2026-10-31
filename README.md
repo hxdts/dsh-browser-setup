@@ -55,18 +55,34 @@ Agent 会在新建标签里操作，你可以在自己的 Chrome 里看着。
 - 新建标签自动进 `DSH` 蓝色分组
 - 想自己用浏览器：点鲸鱼图标 →「锁定」，一键冻结
 
-## 拖拽（browser_drag）
+## 拖拽
 
-本包装层额外注册了一个 `browser_drag` 工具（原插件没有拖拽能力）：
+原插件没有拖拽工具，本仓库通过 `browser_evaluate` 注入指针事件序列实现：
 
-```text
-browser_drag from="#slider" toX=900 toY=300      # 从元素中心拖到坐标
-browser_drag fromX=850 fromY=420 toX=600 toY=300  # 坐标到坐标
+```javascript
+// 在 browser_evaluate 里执行：从 (sx,sy) 拖到 (tx,ty)
+(() => {
+  const sx = 850, sy = 420, tx = 600, ty = 300;
+  const start = document.elementFromPoint(sx, sy) || document.body;
+  const o = (x, y, b) => ({ bubbles: true, cancelable: true, clientX: x, clientY: y, screenX: x, screenY: y, button: 0, buttons: b, pointerId: 1, pointerType: 'mouse', isPrimary: true, view: window });
+  start.dispatchEvent(new PointerEvent('pointerdown', o(sx, sy, 1)));
+  start.dispatchEvent(new MouseEvent('mousedown', o(sx, sy, 1)));
+  for (let i = 1; i <= 20; i++) {
+    const p = i / 20, x = sx + (tx - sx) * p, y = sy + (ty - sy) * p;
+    document.dispatchEvent(new PointerEvent('pointermove', o(x, y, 1)));
+    document.dispatchEvent(new MouseEvent('mousemove', o(x, y, 1)));
+  }
+  document.dispatchEvent(new PointerEvent('pointerup', o(tx, ty, 0)));
+  document.dispatchEvent(new MouseEvent('mouseup', o(tx, ty, 0)));
+  return 'dragged';
+})()
 ```
 
-它按真实轨迹派发 `pointerdown/mousedown → pointermove ×N → pointerup/mouseup`，适用于滑块、地图平移、可排序列表、Canvas 拖拽。实测在百度地图上拖动可正常平移。
+适用于滑块、地图平移、可排序列表、Canvas 拖拽；实测在百度地图上拖动可正常平移。
 
-注意：事件是页面内派发的（`isTrusted=false`），极少数做了可信事件校验的站点可能不响应。
+注意：事件是合成的（`isTrusted=false`），极少数做了可信事件校验的站点可能不响应。
+
+> 早期版本曾尝试注册 `browser_drag` 工具，但插件运行时的 `@deepseek-ai/dsh-tools` 解析依赖宿主内部路径，独立插件包加载失败，已回退为上面的 `browser_evaluate` 方案。
 
 无法按预期运行时，先看 [USAGE.md](USAGE.md)。
 
