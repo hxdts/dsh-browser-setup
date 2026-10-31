@@ -55,6 +55,19 @@ Agent 会在新建标签里操作，你可以在自己的 Chrome 里看着。
 - 新建标签自动进 `DSH` 蓝色分组
 - 想自己用浏览器：点鲸鱼图标 →「锁定」，一键冻结
 
+## 拖拽（browser_drag）
+
+本包装层额外注册了一个 `browser_drag` 工具（原插件没有拖拽能力）：
+
+```text
+browser_drag from="#slider" toX=900 toY=300      # 从元素中心拖到坐标
+browser_drag fromX=850 fromY=420 toX=600 toY=300  # 坐标到坐标
+```
+
+它按真实轨迹派发 `pointerdown/mousedown → pointermove ×N → pointerup/mouseup`，适用于滑块、地图平移、可排序列表、Canvas 拖拽。实测在百度地图上拖动可正常平移。
+
+注意：事件是页面内派发的（`isTrusted=false`），极少数做了可信事件校验的站点可能不响应。
+
 无法按预期运行时，先看 [USAGE.md](USAGE.md)。
 
 ## 组件
