@@ -1,6 +1,6 @@
 {
   "name": "dsh-chrome-control-zh",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "中文版 DSH Chrome 控制：让 DeepSeek Harness 操控你日常的 Google Chrome（真实登录态、可视化操作、支持拖拽）",
   "license": "MIT",
   "type": "module",
