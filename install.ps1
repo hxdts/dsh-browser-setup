@@ -55,6 +55,19 @@ Expand-Archive -Path $zip -DestinationPath $extDir -Force
 if (-not (Test-Path (Join-Path $extDir "manifest.json"))) { throw "解压后未找到 manifest.json，压缩包结构可能已变化。" }
 Write-Host "扩展已解压到: $extDir"
 
+# 移除 tabGroups 权限：避免 Chrome 标签栏出现 DSH 分组（2026-11-05 用户要求）
+$manifestPath = Join-Path $extDir "manifest.json"
+try {
+  $manifest = Get-Content $manifestPath -Raw | ConvertFrom-Json
+  if ($manifest.permissions -contains "tabGroups") {
+    $manifest.permissions = @($manifest.permissions | Where-Object { $_ -ne "tabGroups" })
+    $manifest | ConvertTo-Json -Depth 10 | Set-Content -Path $manifestPath -Encoding UTF8
+    Write-Host "已移除 tabGroups 权限（不会再产生标签分组）。" -ForegroundColor Cyan
+  }
+} catch {
+  Write-Host "移除 tabGroups 权限失败（不影响安装）：$($_.Exception.Message)" -ForegroundColor Yellow
+}
+
 Write-Section "3/3 完成，还差一步（浏览器安全限制）"
 Write-Host "请在 Chrome 中手动加载扩展：" -ForegroundColor Green
 Write-Host "  1. 打开 chrome://extensions"
